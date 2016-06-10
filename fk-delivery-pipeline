@@ -1,7 +1,7 @@
 node {
    // Mark the code checkout 'stage'....
    stage 'Checkout'
-   sh 'echo hello $PARAM_ENV world'
+   echo "hello ${PARAM_ENV} world"
 
 
    // Get some code from a GitHub repository

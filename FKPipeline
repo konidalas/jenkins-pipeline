@@ -1,0 +1,129 @@
+node('master') {
+    stage 'Prerequisite'
+    populateEnvironmentVariables();
+    def values = env['JOB_NAME'].split("-")
+    def service =  values[values.length-1]
+    def codeRepo = "potest@git.corp.flipkart.com:"+env["$service"+".repo"];
+    def codeBranch = env["$service"+".branch"]
+    def buildScript = env["$service"+".buildScript"]
+    def pomLocation = env["$service"+".pomfileLocation"]
+    def sonarUser = env["$service"+".sonarUser"]
+    def sonarPass = env["$service"+".sonarPass"]
+    def sonarUrl = env["$service"+".sonarUrl"]
+    def sonarJdbc = env["$service"+".sonarJdbc"]
+    def jacocoPath = env["$service"+".jacocoPath"]
+    echo "SERVICE is $service"
+    echo "REPO is $codeRepo"
+    echo "BRANCH is $codeBranch"
+    echo "BUILD SCRIPT is $buildScript"
+    echo "POM Location is $pomLocation"
+    echo "SONAR user is $sonarUser"
+    echo "SONAR Pass is $sonarPass"
+    echo "SONAR url is $sonarUrl"
+    echo "SONAR JDBC is $sonarJdbc"
+    echo "JACOCO Path is $jacocoPath"
+    sh "pwd"
+    
+    stage 'Clone'
+    git url: "$codeRepo", branch: "$codeBranch"
+    
+    stage 'Compile Code'
+    sh "/usr/bin/mvn -B -DskipTests verify -f $pomLocation"
+    
+    stage 'Static Analysis'
+    sh "/usr/bin/mvn sonar:sonar -Dusername=$sonarUser -Dpassword=$sonarPass -Dsonar.jdbc.url=$sonarJdbc -Dsonar.host.url=$sonarUrl -Dsonar.jacoco.itReportPath=$jacocoPath -f $pomLocation"
+
+    stage 'Unit Tests'
+    sh "/usr/bin/mvn test -Dmaven.compiler.source=1.8 -Dmaven.compiler.target=1.8 -Dmaven.test.failure.ignore=true -f $pomLocation"
+
+    stage 'Create Build'
+    sh "$buildScript"
+}
+
+void extractHost(String url) {
+    println url;
+    def hostPart = url.split("://");
+    hostPart[1].split(":")[0];
+}
+
+void parseJson(String jsonResponse) {
+    println "Input is $jsonResponse"
+    
+    def slurper = new groovy.json.JsonSlurper();
+    def result = slurper.parseText(jsonResponse)
+    println result.name;
+}
+
+void deleteEnvVariables(String envVar) {
+    def instance = Jenkins.getInstance()
+    def globalNodeProperties = instance.getGlobalNodeProperties()
+    def envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
+
+    def newEnvVarsNodeProperty = null
+    def envVars = null
+
+    if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0) {
+        newEnvVarsNodeProperty = new hudson.slaves.EnvironmentVariablesNodeProperty();
+        globalNodeProperties.add(newEnvVarsNodeProperty)
+        envVars = newEnvVarsNodeProperty.getEnvVars()
+    } else {
+        envVars = envVarsNodePropertyList.get(0).getEnvVars()
+    }
+
+    envVars.remove(envVar)
+    instance.save()
+}
+
+void populateEnvironmentVariables() {
+    Properties props = new Properties()
+    File propsFile = new File('/var/lib/jenkins/RepoHelper')
+    props.load(propsFile.newDataInputStream())
+    
+    def values = env['JOB_NAME'].split("-")
+    def service =  values[values.length-1]
+    
+    def instance = Jenkins.getInstance()
+    def globalNodeProperties = instance.getGlobalNodeProperties()
+    def envVarsNodePropertyList = globalNodeProperties.getAll(hudson.slaves.EnvironmentVariablesNodeProperty.class)
+
+    def newEnvVarsNodeProperty = null
+    def envVars = null
+
+    if ( envVarsNodePropertyList == null || envVarsNodePropertyList.size() == 0) {
+        newEnvVarsNodeProperty = new hudson.slaves.EnvironmentVariablesNodeProperty();
+        globalNodeProperties.add(newEnvVarsNodeProperty)
+        envVars = newEnvVarsNodeProperty.getEnvVars()
+    } else {
+        envVars = envVarsNodePropertyList.get(0).getEnvVars()
+    }
+    
+    def repo = props.getProperty(service+".repo")
+    def branch = props.getProperty(service+".branch")
+    def buildScript = props.getProperty(service+".buildScript")
+    def pomfileLocation = props.getProperty(service+".pomfileLocation")
+
+    if (repo != null && branch != null && buildScript != null && pomfileLocation != null) {
+        envVars.put(service+".repo", repo);
+        envVars.put(service+".branch", branch);
+        envVars.put(service+".buildScript", buildScript);
+        envVars.put(service+".pomfileLocation", pomfileLocation);
+    }
+    
+    instance.save()
+    
+    def sonarUser = props.getProperty(service+".SONAR-USER")
+    def sonarPass = props.getProperty(service+".SONAR-PASS")
+    def sonarUrl = props.getProperty(service+".SONAR-URL")
+    def sonarJdbc = props.getProperty(service+".SONAR-JDBC")
+    def jacocoPath = props.getProperty(service+".JACOCO-PATH")
+
+    if (sonarUser != null && sonarPass != null && sonarUrl != null && sonarJdbc != null && jacocoPath != null) {
+        envVars.put(service+".sonarUser", sonarUser);
+        envVars.put(service+".sonarPass", sonarPass);
+        envVars.put(service+".sonarUrl", sonarUrl);
+        envVars.put(service+".sonarJdbc", sonarJdbc);
+        envVars.put(service+".jacocoPath", jacocoPath);
+    }
+    
+    instance.save()
+}

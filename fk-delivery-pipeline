@@ -6,8 +6,8 @@ node {
 
 
    // Get some code from a GitHub repository
-   git url: 'https://github.com/konidalas/jenkins-pipeline'
    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
+   git url: 'https://github.com/konidalas/jenkins-pipeline'
    
    sh "ls -al"
    

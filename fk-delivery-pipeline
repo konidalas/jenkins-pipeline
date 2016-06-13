@@ -2,6 +2,7 @@ node {
    // Mark the code checkout 'stage'....
    stage 'Checkout'
    echo "hello ${PARAM_ENV} world"
+   echo pwd()
 
 
    // Get some code from a GitHub repository

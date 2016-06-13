@@ -7,7 +7,9 @@ node {
 
    // Get some code from a GitHub repository
    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
-
+   
+   sh "ls -al"
+   
    // Get the maven tool.
    // ** NOTE: This 'M3' maven tool must be configured
    // **       in the global configuration.           
@@ -18,8 +20,7 @@ node {
    stage 'Build'
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean compile"
-   apply from: 'https://github.com/konidalas/jenkins-pipeline/master/ci-module.groovy?token=${env.GITHUB_TOKEN}'
-
+   
 }
 
 //fetchModules()
@@ -31,4 +32,5 @@ node {
 //   file = git show HEAD:ci-module.grovy
 //   writeFile 'ci-module.groovy' file
 //   module1 = load 'ci-module.groovy'
+//   apply from: 'https://github.com/konidalas/jenkins-pipeline/master/ci-module.groovy?token=${env.GITHUB_TOKEN}' -- apply keyword not working
 //}

@@ -19,6 +19,7 @@ node {
    sh "${mvnHome}/bin/mvn clean compile"
    
    stage 'Load Other'   
+   def module1
    module1 = load 'ci-module.groovy'
    module1.functionA()
 

@@ -18,7 +18,8 @@ node {
    stage 'Build'
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean compile"
-   
+   apply from: 'https://github.com/konidalas/jenkins-pipeline/master/ci-module.groovy?token=${env.GITHUB_TOKEN}'
+
 }
 
 //fetchModules()

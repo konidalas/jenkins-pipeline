@@ -6,6 +6,7 @@ node {
 
 
    // Get some code from a GitHub repository
+   git url: 'https://github.com/konidalas/jenkins-pipeline'
    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
    
    sh "ls -al"
@@ -20,7 +21,7 @@ node {
    stage 'Build'
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean compile"
-   
+
 }
 
 //fetchModules()

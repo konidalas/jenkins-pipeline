@@ -7,7 +7,6 @@ node {
 
    // Get some code from a GitHub repository
    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
-   git url: 'https://github.com/konidalas/jenkins-pipeline'
    
    sh "ls -al"
    
@@ -21,6 +20,15 @@ node {
    stage 'Build'
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean compile"
+
+   stage 'Load other modules'
+   def localDir = pwd()
+   def scriptDir = "${localDir}@script"
+   
+   def modulefile = "${scriptDir}/ci-module.grovy"
+   echo "${modulefile}"
+   def module1 = load "${modulefile}"
+   module1.functionA()
 
 }
 

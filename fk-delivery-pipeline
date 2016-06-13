@@ -18,9 +18,15 @@ node {
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean compile"
    
-   stage 'Load Other'   
-   def module1
-   module1 = load 'ci-module.groovy'
-   module1.functionA()
-
 }
+
+//fetchModules()
+//{
+//   stage 'Load Other'   
+//   def module1
+//   module1.functionA()
+//   
+//   file = git show HEAD:ci-module.grovy
+//   writeFile 'ci-module.groovy' file
+//   module1 = load 'ci-module.groovy'
+//}

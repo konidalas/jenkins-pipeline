@@ -14,4 +14,9 @@ node {
    stage 'Build'
    // Run the maven build
    sh "${mvnHome}/bin/mvn clean install"
+
+   stage 'Load Other'   
+   module1 = load 'ci-module.groovy'
+   module1.functionA()
+
 }

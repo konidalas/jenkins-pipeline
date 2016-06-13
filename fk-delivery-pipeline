@@ -27,7 +27,7 @@ node {
    
    def modulefile = "${scriptDir}/ci-module.groovy"
    echo "${modulefile}"
-   sh "ls -al ${scriptDir}"
+   sh "ls -al '${scriptDir}'"
    
    def module1 = load "${modulefile}"
    module1.functionA()

@@ -25,8 +25,10 @@ node {
    def localDir = pwd()
    def scriptDir = "${localDir}@script"
    
-   def modulefile = "${scriptDir}/ci-module.grovy"
+   def modulefile = "${scriptDir}/ci-module.groovy"
    echo "${modulefile}"
+   sh "ls -al ${scriptDir}"
+   
    def module1 = load "${modulefile}"
    module1.functionA()
 

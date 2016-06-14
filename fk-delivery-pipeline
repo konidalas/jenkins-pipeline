@@ -5,6 +5,7 @@ node {
    echo pwd()
 
 
+
    // Get some code from a GitHub repository
    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git'
    
@@ -36,6 +37,7 @@ node {
 
 //fetchModules()
 //{
+//
 //   stage 'Load Other'   
 //   def module1
 //   module1.functionA()
